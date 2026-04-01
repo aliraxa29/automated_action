@@ -1,0 +1,341 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:action_name",
+ "creation": "2026-03-31 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "action_name",
+  "document_type",
+  "enabled",
+  "cb_basic",
+  "trigger",
+  "trigger_fields",
+  "section_conditions",
+  "before_condition_builder",
+  "before_condition",
+  "cb_conditions",
+  "apply_on_condition_builder",
+  "apply_on_condition",
+  "section_time_condition",
+  "trigger_date_field",
+  "delay_count",
+  "cb_time",
+  "delay_type",
+  "section_action",
+  "action_type",
+  "section_update_record",
+  "field_updates",
+  "section_python_code",
+  "python_code",
+  "section_email",
+  "email_template",
+  "send_to_field",
+  "section_create_record",
+  "target_document_type",
+  "link_field",
+  "new_record_values",
+  "section_create_todo",
+  "todo_description",
+  "cb_todo",
+  "assign_to_user",
+  "assign_to_field",
+  "section_add_comment",
+  "comment_text",
+  "section_execution_log",
+  "last_run",
+  "cb_log",
+  "run_count",
+  "last_scheduled_run"
+ ],
+ "fields": [
+  {
+   "fieldname": "action_name",
+   "fieldtype": "Data",
+   "label": "Action Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "cb_basic",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "trigger",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Trigger",
+   "options": "\nOn Create\nOn Update\nOn Create & Update\nOn Delete\nBased on Time Condition",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:['On Update', 'On Create & Update'].includes(doc.trigger)",
+   "description": "Comma-separated field names that trigger this action when updated. Leave empty to trigger on any field change.",
+   "fieldname": "trigger_fields",
+   "fieldtype": "Small Text",
+   "label": "Trigger Fields"
+  },
+  {
+   "depends_on": "eval:['On Update', 'On Create & Update', 'On Create'].includes(doc.trigger)",
+   "fieldname": "section_conditions",
+   "fieldtype": "Section Break",
+   "label": "Conditions"
+  },
+  {
+   "depends_on": "eval:['On Update', 'On Create & Update'].includes(doc.trigger)",
+   "fieldname": "before_condition_builder",
+   "fieldtype": "HTML",
+   "label": "Before Update Condition Builder"
+  },
+  {
+   "depends_on": "eval:['On Update', 'On Create & Update'].includes(doc.trigger)",
+   "description": "JSON filters to match the record BEFORE update. Format: [[\"fieldname\", \"operator\", \"value\"]]. Example: [[\"status\", \"=\", \"Open\"]]",
+   "fieldname": "before_condition",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Before Update Condition",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "cb_conditions",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:['On Update', 'On Create & Update', 'On Create'].includes(doc.trigger)",
+   "fieldname": "apply_on_condition_builder",
+   "fieldtype": "HTML",
+   "label": "Apply On Condition Builder"
+  },
+  {
+   "description": "JSON filters to match the record AFTER update (Apply On). Format: [[\"fieldname\", \"operator\", \"value\"]]. Example: [[\"status\", \"=\", \"Completed\"]]",
+   "fieldname": "apply_on_condition",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Apply On Condition"
+  },
+  {
+   "depends_on": "eval:doc.trigger === 'Based on Time Condition'",
+   "fieldname": "section_time_condition",
+   "fieldtype": "Section Break",
+   "label": "Time Condition"
+  },
+  {
+   "description": "The date/datetime field on the document to use as the trigger reference",
+   "fieldname": "trigger_date_field",
+   "fieldtype": "Select",
+   "label": "Trigger Date Field",
+   "mandatory_depends_on": "eval:doc.trigger === 'Based on Time Condition'"
+  },
+  {
+   "default": "0",
+   "description": "Number of units to wait. Use negative numbers to trigger before the date.",
+   "fieldname": "delay_count",
+   "fieldtype": "Int",
+   "label": "Delay"
+  },
+  {
+   "fieldname": "cb_time",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Hours",
+   "fieldname": "delay_type",
+   "fieldtype": "Select",
+   "label": "Delay Type",
+   "options": "Minutes\nHours\nDays\nMonths"
+  },
+  {
+   "fieldname": "section_action",
+   "fieldtype": "Section Break",
+   "label": "Action"
+  },
+  {
+   "fieldname": "action_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Action Type",
+   "options": "\nUpdate Record\nCreate Record\nExecute Python Code\nSend Email\nCreate ToDo\nAdd Comment",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Update Record'",
+   "fieldname": "section_update_record",
+   "fieldtype": "Section Break",
+   "label": "Field Updates"
+  },
+  {
+   "fieldname": "field_updates",
+   "fieldtype": "Table",
+   "label": "Field Updates",
+   "options": "Automated Action Field Update"
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Execute Python Code'",
+   "fieldname": "section_python_code",
+   "fieldtype": "Section Break",
+   "label": "Python Code"
+  },
+  {
+   "description": "Available variables: doc (the document), frappe. Use frappe.throw() to abort. Do NOT use frappe.db.sql for mutations.",
+   "fieldname": "python_code",
+   "fieldtype": "Code",
+   "label": "Python Code",
+   "options": "Python"
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Send Email'",
+   "fieldname": "section_email",
+   "fieldtype": "Section Break",
+   "label": "Email Configuration"
+  },
+  {
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "label": "Email Template",
+   "options": "Email Template"
+  },
+  {
+   "description": "Field name on the document that contains the recipient email address (e.g. email_id, email, customer_email)",
+   "fieldname": "send_to_field",
+   "fieldtype": "Select",
+   "label": "Send To (Field Name)"
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Create Record'",
+   "fieldname": "section_create_record",
+   "fieldtype": "Section Break",
+   "label": "Create Record Configuration"
+  },
+  {
+   "fieldname": "target_document_type",
+   "fieldtype": "Link",
+   "label": "Target Document Type",
+   "options": "DocType"
+  },
+  {
+   "description": "Field on the new record to link back to the triggering document",
+   "fieldname": "link_field",
+   "fieldtype": "Select",
+   "label": "Link Field"
+  },
+  {
+   "fieldname": "new_record_values",
+   "fieldtype": "Table",
+   "label": "New Record Values",
+   "options": "Automated Action Field Update"
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Create ToDo'",
+   "fieldname": "section_create_todo",
+   "fieldtype": "Section Break",
+   "label": "Create ToDo Configuration"
+  },
+  {
+   "fieldname": "todo_description",
+   "fieldtype": "Small Text",
+   "label": "ToDo Description"
+  },
+  {
+   "fieldname": "cb_todo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "If set, always assigns to this user",
+   "fieldname": "assign_to_user",
+   "fieldtype": "Link",
+   "label": "Assign To (Specific User)",
+   "options": "User"
+  },
+  {
+   "description": "Field name on the document that contains the user to assign to (e.g. owner, assigned_to). Used if Specific User is not set.",
+   "fieldname": "assign_to_field",
+   "fieldtype": "Select",
+   "label": "Assign To (From Record Field)"
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Add Comment'",
+   "fieldname": "section_add_comment",
+   "fieldtype": "Section Break",
+   "label": "Add Comment Configuration"
+  },
+  {
+   "fieldname": "comment_text",
+   "fieldtype": "Small Text",
+   "label": "Comment Text"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_execution_log",
+   "fieldtype": "Section Break",
+   "label": "Execution Log"
+  },
+  {
+   "fieldname": "last_run",
+   "fieldtype": "Datetime",
+   "label": "Last Run",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_log",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "run_count",
+   "fieldtype": "Int",
+   "label": "Run Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_scheduled_run",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Last Scheduled Run",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-04-01 12:42:46.132363",
+ "modified_by": "Administrator",
+ "module": "Automated Actions",
+ "name": "Automated Action",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "action_name",
+ "track_changes": 1
+}

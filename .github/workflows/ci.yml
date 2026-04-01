@@ -1,22 +1,28 @@
 
-name: CI
+name: Server Tests
 
 on:
   push:
     branches:
       - develop
+      - version-15
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
-  group: develop-automated_actions-${{ github.event.number }}
+  group: server-automated_actions-${{ github.event_name }}-${{ github.event.number || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
-    name: Server
+    name: Unit Tests
 
     services:
       redis-cache:
@@ -37,7 +43,7 @@ jobs:
 
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Find tests
         run: |
@@ -45,12 +51,13 @@ jobs:
           grep -rn "def test" > /dev/null
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: pip
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           check-latest: true
@@ -77,7 +84,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install MariaDB Client
-        run: sudo apt-get install mariadb-client-10.6
+        run: sudo apt-get update && sudo apt-get install -y mariadb-client
 
       - name: Setup
         run: |
@@ -104,3 +111,12 @@ jobs:
           bench --site test_site run-tests --app automated_actions
         env:
           TYPE: server
+
+      - name: Show bench logs
+        if: ${{ always() }}
+        working-directory: /home/runner/frappe-bench
+        run: |
+          for f in logs/*.log*; do
+            echo "Printing log: $f"
+            cat "$f" || true
+          done

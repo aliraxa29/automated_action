@@ -68,20 +68,14 @@ def _process_single_time_rule(rule: dict) -> None:
 	now = now_datetime()
 	last_run = get_datetime(rule.get("last_scheduled_run")) if rule.get("last_scheduled_run") else None
 
-	# Calculate the target date window
-	# If delay is +2 days, we look for docs where date_field + 2 days <= now
-	# i.e., date_field <= now - 2 days
 	target_date = add_to_date(now, **{delay_type: -delay_count})
 
-	# Build filters: date_field is in the window between last_run and now
 	filters = {date_field: ["<=", target_date]}
 
 	if last_run:
-		# Only process documents not already processed in previous runs
 		last_target_date = add_to_date(last_run, **{delay_type: -delay_count})
 		filters[date_field] = ["between", [last_target_date, target_date]]
 
-	# Apply the apply_on condition if set
 	if rule.get("apply_on_condition"):
 		import json
 
@@ -124,7 +118,6 @@ def _process_single_time_rule(rule: dict) -> None:
 				message=f"Doc: {doc_name}\n{frappe.get_traceback()}",
 			)
 
-	# Update last_scheduled_run
 	frappe.db.set_value(
 		"Automated Action",
 		rule["name"],

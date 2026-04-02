@@ -2,10 +2,12 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
+
+test_ignore = ["Company"]
 
 
-class TestAutomationRule(IntegrationTestCase):
+class TestAutomationRule(FrappeTestCase):
 
 	def test_rule_creation(self):
 		rule = frappe.get_doc({

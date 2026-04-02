@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "creation": "2026-04-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "step_name",
+  "action_type",
+  "status",
+  "cb_log_step",
+  "started_at",
+  "completed_at",
+  "result_summary",
+  "section_error",
+  "error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "step_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Step Name"
+  },
+  {
+   "fieldname": "action_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Action Type"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nSuccess\nFailed\nSkipped"
+  },
+  {
+   "fieldname": "cb_log_step",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "started_at",
+   "fieldtype": "Datetime",
+   "label": "Started At"
+  },
+  {
+   "fieldname": "completed_at",
+   "fieldtype": "Datetime",
+   "label": "Completed At"
+  },
+  {
+   "fieldname": "result_summary",
+   "fieldtype": "Small Text",
+   "label": "Result Summary"
+  },
+  {
+   "depends_on": "eval:doc.status === 'Failed'",
+   "fieldname": "section_error",
+   "fieldtype": "Section Break",
+   "label": "Error Details"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Long Text",
+   "label": "Error Message"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-04-02 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Automated Actions",
+ "name": "Automation Log Step",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

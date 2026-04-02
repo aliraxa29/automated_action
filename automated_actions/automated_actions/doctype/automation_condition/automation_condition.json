@@ -1,0 +1,57 @@
+{
+ "actions": [],
+ "creation": "2026-04-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "fieldname",
+  "operator",
+  "value",
+  "value_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "fieldname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Field Name",
+   "reqd": 1
+  },
+  {
+   "default": "=",
+   "fieldname": "operator",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Operator",
+   "options": "=\n!=\n>\n<\n>=\n<=\nlike\nnot like\nin\nnot in\nis set\nis not set\nchanged\nchanged to\nchanged from",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:!['is set', 'is not set', 'changed'].includes(doc.operator)",
+   "fieldname": "value",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Value"
+  },
+  {
+   "default": "Static Value",
+   "fieldname": "value_type",
+   "fieldtype": "Select",
+   "label": "Value Type",
+   "options": "Static Value\nDocument Field\nJinja Expression"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-04-02 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Automated Actions",
+ "name": "Automation Condition",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

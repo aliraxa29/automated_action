@@ -1,0 +1,393 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:rule_name",
+ "creation": "2026-04-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_general",
+  "rule_name",
+  "document_type",
+  "enabled",
+  "cb_general",
+  "status",
+  "priority",
+  "module",
+
+  "section_trigger",
+  "trigger_type",
+  "trigger_fields",
+  "field_from_value",
+  "field_to_value",
+  "cb_trigger",
+  "cron_expression",
+  "trigger_date_field",
+  "delay_count",
+  "delay_type",
+
+  "section_cross_doc_trigger",
+  "child_doctype",
+  "linked_doctype",
+  "cb_cross_doc",
+  "linked_field",
+  "linked_status_field",
+  "webhook_secret",
+
+  "section_conditions",
+  "condition_logic",
+  "conditions",
+  "section_custom_condition",
+  "custom_condition",
+
+  "section_actions",
+  "action_steps",
+
+  "section_execution_settings",
+  "run_mode",
+  "stop_on_error",
+  "cb_exec_settings",
+  "allow_repeated_execution",
+  "recursion_protection",
+  "company",
+
+  "section_execution_log",
+  "last_run",
+  "run_count",
+  "cb_exec_log",
+  "last_scheduled_run",
+  "last_error"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_general",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "rule_name",
+   "fieldtype": "Data",
+   "label": "Rule Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "cb_general",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nActive\nPaused\nError"
+  },
+  {
+   "default": "0",
+   "description": "Higher priority rules execute first",
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority"
+  },
+  {
+   "fieldname": "module",
+   "fieldtype": "Link",
+   "label": "Module",
+   "options": "Module Def"
+  },
+  {
+   "fieldname": "section_trigger",
+   "fieldtype": "Section Break",
+   "label": "Trigger"
+  },
+  {
+   "fieldname": "trigger_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Trigger Type",
+   "options": "\nOn Create\nOn Update\nOn Create & Update\nOn Delete\nField Value Change\nTime Based\nCron Schedule\nChild Record Added\nLinked Document Change\nWebhook Received",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:['On Update', 'On Create & Update', 'Field Value Change'].includes(doc.trigger_type)",
+   "description": "Comma-separated field names to watch. Leave empty to trigger on any change.",
+   "fieldname": "trigger_fields",
+   "fieldtype": "Small Text",
+   "label": "Trigger Fields"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Field Value Change'",
+   "description": "Only trigger when field changes FROM this value. Leave empty for any old value.",
+   "fieldname": "field_from_value",
+   "fieldtype": "Data",
+   "label": "From Value"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Field Value Change'",
+   "description": "Only trigger when field changes TO this value. Leave empty for any new value.",
+   "fieldname": "field_to_value",
+   "fieldtype": "Data",
+   "label": "To Value"
+  },
+  {
+   "fieldname": "cb_trigger",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Cron Schedule'",
+   "description": "Standard cron expression (e.g., '0 9 * * 1' for Monday 9 AM). Uses server timezone.",
+   "fieldname": "cron_expression",
+   "fieldtype": "Data",
+   "label": "Cron Expression",
+   "mandatory_depends_on": "eval:doc.trigger_type === 'Cron Schedule'"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Time Based'",
+   "description": "Date/datetime field on the document to use as trigger reference",
+   "fieldname": "trigger_date_field",
+   "fieldtype": "Select",
+   "label": "Trigger Date Field",
+   "mandatory_depends_on": "eval:doc.trigger_type === 'Time Based'"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.trigger_type === 'Time Based'",
+   "description": "Number of units after/before the date. Negative = before.",
+   "fieldname": "delay_count",
+   "fieldtype": "Int",
+   "label": "Delay"
+  },
+  {
+   "default": "Hours",
+   "depends_on": "eval:doc.trigger_type === 'Time Based'",
+   "fieldname": "delay_type",
+   "fieldtype": "Select",
+   "label": "Delay Unit",
+   "options": "Minutes\nHours\nDays\nMonths"
+  },
+  {
+   "depends_on": "eval:['Child Record Added', 'Linked Document Change'].includes(doc.trigger_type)",
+   "fieldname": "section_cross_doc_trigger",
+   "fieldtype": "Section Break",
+   "label": "Cross-Document Trigger"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Child Record Added'",
+   "description": "The child DocType to watch for new rows",
+   "fieldname": "child_doctype",
+   "fieldtype": "Link",
+   "label": "Child DocType",
+   "options": "DocType"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Linked Document Change'",
+   "description": "The linked DocType to monitor",
+   "fieldname": "linked_doctype",
+   "fieldtype": "Link",
+   "label": "Linked DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "cb_cross_doc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Linked Document Change'",
+   "description": "Field on the current document that links to the monitored DocType",
+   "fieldname": "linked_field",
+   "fieldtype": "Data",
+   "label": "Link Field"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Linked Document Change'",
+   "description": "Status field to monitor on the linked document",
+   "fieldname": "linked_status_field",
+   "fieldtype": "Data",
+   "label": "Status Field"
+  },
+  {
+   "depends_on": "eval:doc.trigger_type === 'Webhook Received'",
+   "description": "Secret key for webhook signature validation (HMAC-SHA256)",
+   "fieldname": "webhook_secret",
+   "fieldtype": "Password",
+   "label": "Webhook Secret"
+  },
+  {
+   "depends_on": "eval:['On Create', 'On Update', 'On Create & Update', 'On Delete', 'Field Value Change', 'Time Based', 'Cron Schedule', 'Child Record Added', 'Linked Document Change'].includes(doc.trigger_type)",
+   "fieldname": "section_conditions",
+   "fieldtype": "Section Break",
+   "label": "Conditions"
+  },
+  {
+   "default": "All Match (AND)",
+   "fieldname": "condition_logic",
+   "fieldtype": "Select",
+   "label": "Condition Logic",
+   "options": "All Match (AND)\nAny Match (OR)"
+  },
+  {
+   "fieldname": "conditions",
+   "fieldtype": "Table",
+   "label": "Conditions",
+   "options": "Automation Condition"
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:['On Create', 'On Update', 'On Create & Update', 'On Delete', 'Field Value Change', 'Time Based', 'Cron Schedule'].includes(doc.trigger_type)",
+   "fieldname": "section_custom_condition",
+   "fieldtype": "Section Break",
+   "label": "Custom Condition (Advanced)"
+  },
+  {
+   "description": "Jinja expression evaluated against the document. Must return truthy to proceed. Example: {{ doc.grand_total > 1000 and doc.status == 'Draft' }}",
+   "fieldname": "custom_condition",
+   "fieldtype": "Code",
+   "label": "Custom Condition",
+   "options": "Jinja"
+  },
+  {
+   "fieldname": "section_actions",
+   "fieldtype": "Section Break",
+   "label": "Action Steps"
+  },
+  {
+   "fieldname": "action_steps",
+   "fieldtype": "Table",
+   "label": "Action Steps",
+   "options": "Automation Action Step",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_execution_settings",
+   "fieldtype": "Section Break",
+   "label": "Execution Settings"
+  },
+  {
+   "default": "Synchronous",
+   "description": "Synchronous: runs inline during save. Asynchronous: queued as background job.",
+   "fieldname": "run_mode",
+   "fieldtype": "Select",
+   "label": "Run Mode",
+   "options": "Synchronous\nAsynchronous"
+  },
+  {
+   "default": "1",
+   "description": "Stop executing remaining steps if any step fails",
+   "fieldname": "stop_on_error",
+   "fieldtype": "Check",
+   "label": "Stop on Error"
+  },
+  {
+   "fieldname": "cb_exec_settings",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Allow this rule to fire again on the same document (e.g., for recurring time-based checks)",
+   "fieldname": "allow_repeated_execution",
+   "fieldtype": "Check",
+   "label": "Allow Repeated Execution"
+  },
+  {
+   "default": "1",
+   "description": "Prevent this rule from re-triggering itself during execution",
+   "fieldname": "recursion_protection",
+   "fieldtype": "Check",
+   "label": "Recursion Protection"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_execution_log",
+   "fieldtype": "Section Break",
+   "label": "Execution Log"
+  },
+  {
+   "fieldname": "last_run",
+   "fieldtype": "Datetime",
+   "label": "Last Run",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "run_count",
+   "fieldtype": "Int",
+   "label": "Run Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_exec_log",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_scheduled_run",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Last Scheduled Run",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_error",
+   "fieldtype": "Small Text",
+   "label": "Last Error",
+   "read_only": 1
+  }
+ ],
+ "links": [
+  {
+   "group": "Logs",
+   "link_doctype": "Automation Log",
+   "link_fieldname": "automation_rule"
+  }
+ ],
+ "modified": "2026-04-02 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Automated Actions",
+ "name": "Automation Rule",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "priority",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "rule_name",
+ "track_changes": 1
+}

@@ -1,0 +1,150 @@
+{
+ "actions": [],
+ "autoname": "ALOG-.#####",
+ "creation": "2026-04-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "automation_rule",
+  "rule_name",
+  "document_type",
+  "document_name",
+  "cb_log_main",
+  "trigger_type",
+  "status",
+  "section_timing",
+  "started_at",
+  "completed_at",
+  "cb_timing",
+  "duration_ms",
+  "section_steps",
+  "steps",
+  "section_error",
+  "error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "automation_rule",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Automation Rule",
+   "options": "Automation Rule",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rule_name",
+   "fieldtype": "Data",
+   "label": "Rule Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "document_name",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "Document Name",
+   "options": "document_type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_log_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "trigger_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Trigger Type",
+   "read_only": 1
+  },
+  {
+   "default": "Running",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Running\nSuccess\nPartial\nFailed\nSkipped",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_timing",
+   "fieldtype": "Section Break",
+   "label": "Timing"
+  },
+  {
+   "fieldname": "started_at",
+   "fieldtype": "Datetime",
+   "label": "Started At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "completed_at",
+   "fieldtype": "Datetime",
+   "label": "Completed At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_timing",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "duration_ms",
+   "fieldtype": "Float",
+   "label": "Duration (ms)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_steps",
+   "fieldtype": "Section Break",
+   "label": "Step Results"
+  },
+  {
+   "fieldname": "steps",
+   "fieldtype": "Table",
+   "label": "Steps",
+   "options": "Automation Log Step",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.status === 'Failed'",
+   "fieldname": "section_error",
+   "fieldtype": "Section Break",
+   "label": "Error Details"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Long Text",
+   "label": "Error Message",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-04-02 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Automated Actions",
+ "name": "Automation Log",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "read": 1,
+   "role": "System Manager"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "rule_name",
+ "track_changes": 0
+}

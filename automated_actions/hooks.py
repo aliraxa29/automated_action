@@ -150,6 +150,7 @@ doc_events = {
 		"after_insert": "automated_actions.handlers.handle_after_insert",
 		"on_update": "automated_actions.handlers.handle_on_update",
 		"on_trash": "automated_actions.handlers.handle_on_trash",
+		"on_update_after_submit": "automated_actions.handlers.handle_on_update_after_submit",
 	}
 }
 
@@ -158,8 +159,11 @@ doc_events = {
 
 scheduler_events = {
 	"cron": {
-		"0 */4 * * *": [
-			"automated_actions.scheduler.process_time_based_rules",
+		"*/15 * * * *": [
+			"automated_actions.scheduler.process_time_based_automation_rules",
+		],
+		"* * * * *": [
+			"automated_actions.scheduler.process_cron_automation_rules",
 		],
 	},
 }

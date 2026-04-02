@@ -4,7 +4,7 @@
 from frappe.model.document import Document
 
 
-class AutomatedActionFieldUpdate(Document):
+class AutomationLogStep(Document):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
 
@@ -13,11 +13,17 @@ class AutomatedActionFieldUpdate(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		fieldname: DF.Data
+		action_type: DF.Data | None
+		completed_at: DF.Datetime | None
+		error_message: DF.LongText | None
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data
-		value: DF.SmallText | None
+		result_summary: DF.SmallText | None
+		started_at: DF.Datetime | None
+		status: DF.Literal["Pending", "Success", "Failed", "Skipped"]
+		step_name: DF.Data | None
 
 	# end: auto-generated types
+
 	pass

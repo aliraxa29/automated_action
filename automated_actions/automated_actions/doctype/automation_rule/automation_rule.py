@@ -42,14 +42,9 @@ class AutomationRule(Document):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
+		from automated_actions.automated_actions.doctype.automation_action_step.automation_action_step import AutomationActionStep
+		from automated_actions.automated_actions.doctype.automation_condition.automation_condition import AutomationCondition
 		from frappe.types import DF
-
-		from automated_actions.automated_actions.doctype.automation_action_step.automation_action_step import (
-			AutomationActionStep,
-		)
-		from automated_actions.automated_actions.doctype.automation_condition.automation_condition import (
-			AutomationCondition,
-		)
 
 		action_steps: DF.Table[AutomationActionStep]
 		allow_repeated_execution: DF.Check
@@ -79,23 +74,10 @@ class AutomationRule(Document):
 		run_mode: DF.Literal["Synchronous", "Asynchronous"]
 		status: DF.Literal["Draft", "Active", "Paused", "Error"]
 		stop_on_error: DF.Check
-		trigger_date_field: DF.Data | None
+		trigger_date_field: DF.Literal[None]
 		trigger_fields: DF.SmallText | None
-		trigger_type: DF.Literal[
-			"",
-			"On Create",
-			"On Update",
-			"On Create & Update",
-			"On Delete",
-			"Field Value Change",
-			"Time Based",
-			"Cron Schedule",
-			"Child Record Added",
-			"Linked Document Change",
-			"Webhook Received",
-		]
+		trigger_type: DF.Literal["", "On Create", "On Update", "On Create & Update", "On Delete", "Field Value Change", "Time Based", "Cron Schedule", "Child Record Added", "Linked Document Change", "Webhook Received"]
 		webhook_secret: DF.Password | None
-
 	# end: auto-generated types
 
 	def validate(self):

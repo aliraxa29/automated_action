@@ -23,7 +23,6 @@ class AutomationLogStep(Document):
 		started_at: DF.Datetime | None
 		status: DF.Literal["Pending", "Success", "Failed", "Skipped"]
 		step_name: DF.Data | None
-
 	# end: auto-generated types
 
 	pass

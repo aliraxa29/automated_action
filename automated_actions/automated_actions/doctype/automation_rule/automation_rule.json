@@ -14,7 +14,6 @@
   "status",
   "priority",
   "module",
-
   "section_trigger",
   "trigger_type",
   "trigger_fields",
@@ -25,7 +24,6 @@
   "trigger_date_field",
   "delay_count",
   "delay_type",
-
   "section_cross_doc_trigger",
   "child_doctype",
   "linked_doctype",
@@ -33,16 +31,13 @@
   "linked_field",
   "linked_status_field",
   "webhook_secret",
-
   "section_conditions",
   "condition_logic",
   "conditions",
   "section_custom_condition",
   "custom_condition",
-
   "section_actions",
   "action_steps",
-
   "section_execution_settings",
   "run_mode",
   "stop_on_error",
@@ -50,7 +45,6 @@
   "allow_repeated_execution",
   "recursion_protection",
   "company",
-
   "section_execution_log",
   "last_run",
   "run_count",
@@ -364,7 +358,7 @@
    "link_fieldname": "automation_rule"
   }
  ],
- "modified": "2026-04-02 00:00:00",
+ "modified": "2026-04-02 15:04:00.209233",
  "modified_by": "Administrator",
  "module": "Automated Actions",
  "name": "Automation Rule",

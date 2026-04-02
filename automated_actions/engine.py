@@ -224,15 +224,12 @@ def _add_log_step(log, step, status, started_at, result=None, error=None):
 
 def _update_rule_stats(rule_name, status):
 	"""Update last_run, run_count, and last_error on the Automation Rule."""
+	old_count = frappe.db.get_value("Automation Rule", rule_name, "run_count") or 0
 	update = {
 		"last_run": now_datetime(),
-		"run_count": ("run_count", "+", 1),
+		"run_count": old_count + 1,
+		"last_error": frappe.get_traceback() if status == "Failed" else "",
 	}
-	if status == "Failed":
-		update["last_error"] = frappe.get_traceback()
-	else:
-		update["last_error"] = ""
-
 	frappe.db.set_value("Automation Rule", rule_name, update, update_modified=False)
 
 
@@ -276,6 +273,22 @@ def _run_steps_async(rule_name, doc_doctype, doc_name, step_names):
 		frappe.db.commit()
 
 		_update_rule_stats(rule_name, log.status)
+
+
+def _run_rule_async(rule_name, doc_doctype, doc_name):
+	"""Re-fetch the rule and document then run the automation.
+
+	This is the RQ job entrypoint for asynchronous rule execution.
+	Accepts primitive types only so RQ serialisation is safe.
+
+	Args:
+		rule_name: Name of the Automation Rule.
+		doc_doctype: DocType of the triggering document.
+		doc_name: Name of the triggering document.
+	"""
+	rule = frappe.get_doc("Automation Rule", rule_name)
+	doc = frappe.get_doc(doc_doctype, doc_name)
+	run_automation_rule(rule, doc)
 
 
 @frappe.whitelist()

@@ -138,6 +138,8 @@ def execute_create_child_row(step, doc, rule, context=None):
 		return "No parent table field specified"
 
 	values = parse_field_updates(step.create_values_json, doc, context)
+	# Reload to avoid timestamp mismatch if a prior step modified the doc
+	doc.reload()
 	row = doc.append(parent_field, values)
 	doc.save(ignore_permissions=True)
 	return f"Added child row to {parent_field} (idx {row.idx})"
@@ -395,21 +397,8 @@ def execute_server_script(step, doc, rule, context=None):
 		"context": context or {},
 		"now_datetime": now_datetime,
 		"_": _,
-	}
-
-	safe_builtins = {
-		"True": True, "False": False, "None": None,
-		"int": int, "float": float, "str": str, "bool": bool,
-		"list": list, "dict": dict, "tuple": tuple, "set": set,
-		"len": len, "range": range, "enumerate": enumerate, "zip": zip,
-		"map": map, "filter": filter, "sorted": sorted,
-		"min": min, "max": max, "sum": sum, "abs": abs, "round": round,
-		"isinstance": isinstance, "getattr": getattr, "setattr": setattr,
-		"hasattr": hasattr,
-		"print": frappe.logger("automated_actions").info,
 		"json": json,
 	}
-	exec_globals["__builtins__"] = safe_builtins
 
 	frappe.utils.safe_exec.safe_exec(code, _globals=exec_globals, _locals={"doc": doc})
 	return "Python code executed"

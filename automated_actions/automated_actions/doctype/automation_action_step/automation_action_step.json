@@ -26,6 +26,7 @@
   "assign_to_field",
   "section_communication",
   "email_template",
+  "whatsapp_template",
   "send_to",
   "send_to_field",
   "cb_communication",
@@ -200,6 +201,13 @@
    "fieldtype": "Link",
    "label": "Email Template",
    "options": "Email Template"
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'Send WhatsApp'",
+   "description": "Select a WhatsApp template (requires WhatsApp app to be installed)",
+   "fieldname": "whatsapp_template",
+   "fieldtype": "Data",
+   "label": "WhatsApp Template"
   },
   {
    "depends_on": "eval:['Send Email', 'Send WhatsApp', 'Send Notification'].includes(doc.action_type)",

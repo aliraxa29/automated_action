@@ -49,7 +49,6 @@ class AutomationRule(Document):
 		action_steps: DF.Table[AutomationActionStep]
 		allow_repeated_execution: DF.Check
 		child_doctype: DF.Link | None
-		company: DF.Link | None
 		condition_logic: DF.Literal["All Match (AND)", "Any Match (OR)"]
 		conditions: DF.Table[AutomationCondition]
 		cron_expression: DF.Data | None
@@ -210,6 +209,13 @@ class AutomationRule(Document):
 
 	def on_update(self):
 		_clear_automation_rule_cache()
+		if frappe.conf.developer_mode and self.module:
+			from frappe.modules.export_file import export_to_files
+
+			export_to_files(
+				record_list=[["Automation Rule", self.name]],
+				record_module=self.module,
+			)
 
 	def on_trash(self):
 		_clear_automation_rule_cache()
@@ -217,3 +223,18 @@ class AutomationRule(Document):
 
 def _clear_automation_rule_cache():
 	frappe.cache.delete_key("automation_rules")
+
+
+@frappe.whitelist()
+def get_whatsapp_template_doctype(possible_doctypes=None):
+	"""Return the first WhatsApp template DocType that exists, or None."""
+	if isinstance(possible_doctypes, str):
+		possible_doctypes = json.loads(possible_doctypes)
+
+	if not possible_doctypes:
+		possible_doctypes = ["WhatsApp Templates", "WhatsApp Message Template", "WhatsApp Template"]
+
+	for dt in possible_doctypes:
+		if frappe.db.exists("DocType", dt):
+			return dt
+	return None

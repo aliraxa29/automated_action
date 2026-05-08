@@ -107,11 +107,6 @@ def _run_rule_safe(rule_dict, doc):
 	try:
 		rule = frappe.get_doc("Automation Rule", rule_name)
 
-		# Company scope check
-		if rule.company and doc.get("company") and doc.company != rule.company:
-			return
-
-		# Evaluate conditions
 		doc_before_save = doc.get_doc_before_save() if hasattr(doc, "get_doc_before_save") else None
 		if not evaluate_conditions(rule, doc, doc_before_save):
 			return

@@ -6,6 +6,7 @@ frappe.ui.form.on("Automation Rule", {
 		_set_queries(frm);
 		_set_dynamic_field_options(frm);
 		_toggle_trigger_sections(frm);
+		_setup_whatsapp_template_field(frm);
 
 		if (!frm.is_new() && frm.doc.enabled) {
 			frm.add_custom_button(__("Test Run"), function () {
@@ -62,9 +63,34 @@ frappe.ui.form.on("Automation Action Step", {
 		_set_action_category(row);
 		frm.refresh_field("action_steps");
 	},
+
+	email_template(frm, cdt, cdn) {
+		_fetch_email_template(frm, cdt, cdn);
+	},
+
+	whatsapp_template(frm, cdt, cdn) {
+		_fetch_whatsapp_template(frm, cdt, cdn);
+	},
+
+	form_render(frm, cdt, cdn) {
+		_setup_json_editor_buttons(frm, cdt, cdn);
+	},
 });
 
 frappe.ui.form.on("Automation Condition", {
+	value_type(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (row.value_type === "Document Field") {
+			frappe.model.set_value(cdt, cdn, "value", row.value_document_field || "");
+		}
+		frm.refresh_field("conditions");
+	},
+
+	value_document_field(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		frappe.model.set_value(cdt, cdn, "value", row.value_document_field);
+	},
+
 	fieldname(frm, cdt, cdn) {
 		frm.refresh_field("conditions");
 	},
@@ -104,15 +130,22 @@ function _set_queries(frm) {
 		};
 }
 
+// ─── Dynamic field options from document_type ──────────────────────────────────
 function _set_dynamic_field_options(frm) {
 	if (!frm.doc.document_type) {
 		frm.set_df_property("trigger_date_field", "options", "");
+		if (frm.fields_dict.conditions) {
+			frm.fields_dict.conditions.grid.update_docfield_property("fieldname", "options", "");
+			frm.fields_dict.conditions.grid.update_docfield_property("value_document_field", "options", "");
+			frm.refresh_field("conditions");
+		}
 		return;
 	}
 
 	frappe.model.with_doctype(frm.doc.document_type, function () {
 		const meta = frappe.get_meta(frm.doc.document_type);
 
+		// Date/Datetime fields for trigger_date_field
 		const dateFields = meta.fields
 			.filter((f) => ["Date", "Datetime"].includes(f.fieldtype))
 			.map((f) => f.fieldname);
@@ -122,13 +155,14 @@ function _set_dynamic_field_options(frm) {
 			["", ...dateFields].join("\n")
 		);
 
+		// All value-holding fields for conditions
 		const allFields = meta.fields
 			.filter(
 				(f) =>
 					f.fieldname &&
 					!frappe.model.no_value_type.includes(f.fieldtype)
 			)
-			.map((f) => f.fieldname);
+			.map((f) => `${f.fieldname}`);
 		const fieldOptions = ["", ...allFields].join("\n");
 
 		if (frm.fields_dict.conditions) {
@@ -137,11 +171,17 @@ function _set_dynamic_field_options(frm) {
 				"options",
 				fieldOptions
 			);
+			frm.fields_dict.conditions.grid.update_docfield_property(
+				"value_document_field",
+				"options",
+				fieldOptions
+			);
 			frm.refresh_field("conditions");
 		}
 	});
 }
 
+// ─── Trigger section visibility ────────────────────────────────────────────────
 function _toggle_trigger_sections(frm) {
 	const tt = frm.doc.trigger_type;
 
@@ -171,6 +211,7 @@ function _toggle_trigger_sections(frm) {
 	frm.toggle_display("webhook_secret", tt === "Webhook Received");
 }
 
+// ─── Action category classification ───────────────────────────────────────────
 function _set_action_category(row) {
 	const advanced = [
 		"Execute Server Script",
@@ -189,4 +230,304 @@ function _set_action_category(row) {
 	} else {
 		row.action_category = "Business Action";
 	}
+}
+
+// ─── Email template auto-fill ──────────────────────────────────────────────────
+function _fetch_email_template(frm, cdt, cdn) {
+	const row = locals[cdt][cdn];
+	if (!row.email_template) return;
+
+	frappe.db.get_value(
+		"Email Template",
+		row.email_template,
+		["subject", "response"],
+		(r) => {
+			if (r) {
+				frappe.model.set_value(cdt, cdn, "subject", r.subject || "");
+				frappe.model.set_value(cdt, cdn, "message_template", r.response || "");
+				frm.refresh_field("action_steps");
+			}
+		}
+	);
+}
+
+// ─── WhatsApp template handling ────────────────────────────────────────────────
+let _whatsapp_doctype = null;
+
+function _setup_whatsapp_template_field(frm) {
+	// Detect which WhatsApp template DocType is available
+	const possible_doctypes = ["WhatsApp Templates", "WhatsApp Message Template", "WhatsApp Template"];
+
+	frappe.xcall("automated_actions.automated_actions.doctype.automation_rule.automation_rule.get_whatsapp_template_doctype", {
+		possible_doctypes: possible_doctypes,
+	}).then((doctype_name) => {
+		_whatsapp_doctype = doctype_name;
+		if (doctype_name && frm.fields_dict.action_steps) {
+			// Make the data field behave like a link using awesomebar
+			frm.fields_dict.action_steps.grid.update_docfield_property(
+				"whatsapp_template",
+				"description",
+				__("Linked to {0}", [doctype_name])
+			);
+		} else if (frm.fields_dict.action_steps) {
+			frm.fields_dict.action_steps.grid.update_docfield_property(
+				"whatsapp_template",
+				"hidden",
+				1
+			);
+		}
+		frm.refresh_field("action_steps");
+	});
+}
+
+function _fetch_whatsapp_template(frm, cdt, cdn) {
+	const row = locals[cdt][cdn];
+	if (!row.whatsapp_template || !_whatsapp_doctype) return;
+
+	frappe.db.get_value(
+		_whatsapp_doctype,
+		row.whatsapp_template,
+		["*"],
+		(r) => {
+			if (r) {
+				// Try common field names for subject and message
+				const subject = r.subject || r.template_name || r.name || "";
+				const message = r.message || r.template || r.response || r.content || r.body || "";
+				frappe.model.set_value(cdt, cdn, "subject", subject);
+				frappe.model.set_value(cdt, cdn, "message_template", message);
+				frm.refresh_field("action_steps");
+			}
+		}
+	);
+}
+
+// ─── JSON editor dialogs for field_updates_json & create_values_json ───────────
+function _setup_json_editor_buttons(frm, cdt, cdn) {
+	const row = locals[cdt][cdn];
+	const grid_row = frm.fields_dict.action_steps.grid.grid_rows_by_docname[cdn];
+	if (!grid_row || !grid_row.grid_form) return;
+	const fields_dict = grid_row.grid_form.fields_dict;
+
+	// Button for field_updates_json
+	if (["Update Current Record", "Update Linked Record"].includes(row.action_type)) {
+		const target_dt = row.action_type === "Update Current Record"
+			? frm.doc.document_type
+			: row.target_doctype;
+		_attach_editor_btn(
+			fields_dict.field_updates_json,
+			__("Edit Field Updates"),
+			frm, cdt, cdn, "field_updates_json", target_dt
+		);
+	}
+
+	// Button for create_values_json
+	if (["Create Record", "Create Child Row"].includes(row.action_type)) {
+		_attach_editor_btn(
+			fields_dict.create_values_json,
+			__("Edit Record Values"),
+			frm, cdt, cdn, "create_values_json", row.target_doctype
+		);
+	}
+}
+
+function _attach_editor_btn(field_control, label, frm, cdt, cdn, fieldname, doctype_for_fields) {
+	if (!field_control || !field_control.$wrapper) return;
+	const $wrapper = field_control.$wrapper;
+
+	// Avoid duplicate buttons
+	if ($wrapper.find(".json-editor-btn").length) return;
+
+	const $btn = $(`<button class="btn btn-xs btn-default json-editor-btn" style="margin-bottom:8px; margin-top:4px;">
+		<svg class="icon icon-sm" style="margin-right:4px;"><use href="#icon-edit"></use></svg>${label}
+	</button>`);
+
+	$btn.on("click", function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		_open_json_editor_dialog(frm, cdt, cdn, fieldname, label, doctype_for_fields);
+	});
+
+	// Insert button right before the code editor input area
+	$wrapper.find(".control-input-wrapper").first().before($btn);
+	// If that didn't work, try prepending to wrapper
+	if (!$wrapper.find(".json-editor-btn").length) {
+		$wrapper.prepend($btn);
+	}
+}
+
+function _get_selectable_fields(doctype) {
+	if (!doctype) {
+		return [];
+	}
+
+	const meta = frappe.get_meta(doctype);
+	return meta.fields.filter(
+		(field) => field.fieldname && !frappe.model.no_value_type.includes(field.fieldtype)
+	);
+}
+
+function _format_action_entry_value(value) {
+	if (Array.isArray(value) || (value && typeof value === "object")) {
+		return JSON.stringify(value, null, 2);
+	}
+
+	return value ?? "";
+}
+
+function _parse_action_entry_value(value) {
+	if (typeof value !== "string") {
+		return value;
+	}
+
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return "";
+	}
+
+	if (["[", "{"].includes(trimmed[0])) {
+		try {
+			return JSON.parse(trimmed);
+		} catch (e) {
+			return value;
+		}
+	}
+
+	return value;
+}
+
+function _open_json_editor_dialog(frm, cdt, cdn, fieldname, title, doctype_for_fields) {
+	const row = locals[cdt][cdn];
+	let existing = [];
+	try {
+		existing = JSON.parse(row[fieldname] || "[]");
+	} catch (e) {
+		existing = [];
+	}
+
+	if (!doctype_for_fields) {
+		frappe.msgprint(__("Please select a Target Document Type first."));
+		return;
+	}
+
+	frappe.model.with_doctype(doctype_for_fields, () => {
+		const target_field_options = [
+			"",
+			..._get_selectable_fields(doctype_for_fields).map((field) => field.fieldname),
+		];
+
+		const render_dialog = (source_field_options) => {
+			const d = new frappe.ui.Dialog({
+				title: title + " — " + doctype_for_fields,
+				size: "extra-large",
+				fields: [
+					{
+						fieldtype: "HTML",
+						fieldname: "help_text",
+						options: `<p class="text-muted" style="margin-bottom:10px;">
+							Select fields from <strong>${doctype_for_fields}</strong> and set their values.
+							Use <strong>Document Field</strong> to copy a value from the triggering document,
+							or use <strong>Jinja Expression</strong> like <code>{{ doc.fieldname }}</code>.
+						</p>`,
+					},
+					{
+						fieldtype: "Table",
+						fieldname: "entries",
+						label: __("Fields"),
+						cannot_add_rows: false,
+						in_place_edit: true,
+						fields: [
+							{
+								fieldtype: "Select",
+								fieldname: "fieldname",
+								label: __("Field"),
+								options: target_field_options.join("\n"),
+								in_list_view: 1,
+								reqd: 1,
+								columns: 3,
+							},
+							{
+								fieldtype: "Select",
+								fieldname: "value_type",
+								label: __("Type"),
+								options: "Static Value\nDocument Field\nJinja Expression",
+								default: "Static Value",
+								in_list_view: 1,
+								columns: 2,
+							},
+							{
+								fieldtype: "Small Text",
+								fieldname: "value",
+								label: __("Value"),
+								in_list_view: 1,
+								columns: 4,
+							},
+							{
+								fieldtype: "Select",
+								fieldname: "value_document_field",
+								label: __("Source Field"),
+								options: source_field_options.join("\n"),
+								in_list_view: 1,
+								columns: 3,
+							},
+						],
+						data: existing.map((entry) => {
+							const inferred_type = entry.value_type
+								|| (entry.value_document_field ? "Document Field" : "")
+								|| (
+									typeof entry.value === "string" && entry.value.includes("{{")
+										? "Jinja Expression"
+										: "Static Value"
+								);
+
+							return {
+								fieldname: entry.fieldname || "",
+								value_type: inferred_type,
+								value: inferred_type === "Document Field" ? "" : _format_action_entry_value(entry.value),
+								value_document_field: entry.value_document_field
+									|| (inferred_type === "Document Field" ? entry.value || "" : ""),
+							};
+						}),
+					},
+				],
+				primary_action_label: __("Apply"),
+				primary_action(values) {
+					const entries = (values.entries || [])
+						.filter((entry) => entry.fieldname)
+						.map((entry) => {
+							const payload = {
+								fieldname: entry.fieldname,
+								value_type: entry.value_type || "Static Value",
+							};
+
+							if (payload.value_type === "Document Field") {
+								payload.value_document_field = entry.value_document_field || "";
+								payload.value = payload.value_document_field || "";
+							} else {
+								payload.value = _parse_action_entry_value(entry.value);
+							}
+
+							return payload;
+						});
+
+					frappe.model.set_value(cdt, cdn, fieldname, JSON.stringify(entries, null, 2));
+					frm.dirty();
+					d.hide();
+				},
+			});
+
+			d.show();
+		};
+
+		if (frm.doc.document_type) {
+			frappe.model.with_doctype(frm.doc.document_type, () => {
+				const source_field_options = [
+					"",
+					..._get_selectable_fields(frm.doc.document_type).map((field) => field.fieldname),
+				];
+				render_dialog(source_field_options);
+			});
+		} else {
+			render_dialog([""]);
+		}
+	});
 }

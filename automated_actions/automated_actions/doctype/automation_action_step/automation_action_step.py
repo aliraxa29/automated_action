@@ -48,6 +48,7 @@ class AutomationActionStep(Document):
 		wait_duration_type: DF.Literal["Seconds", "Minutes", "Hours", "Days"]
 		webhook_auth_credentials: DF.Password | None
 		webhook_auth_type: DF.Literal["None", "Basic Auth", "Bearer Token", "API Key"]
+		whatsapp_template: DF.Data | None
 		webhook_body_json: DF.Code | None
 		webhook_headers_json: DF.Code | None
 		webhook_method: DF.Literal["GET", "POST", "PUT", "PATCH", "DELETE"]

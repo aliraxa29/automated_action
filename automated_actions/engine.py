@@ -51,7 +51,7 @@ def _get_cached_rules():
 					"name", "rule_name", "document_type", "trigger_type", "trigger_fields",
 					"field_from_value", "field_to_value", "enabled", "priority",
 					"run_mode", "stop_on_error", "allow_repeated_execution",
-					"recursion_protection", "company",
+					"recursion_protection",
 					"trigger_date_field", "delay_count", "delay_type",
 					"cron_expression", "child_doctype", "linked_doctype",
 					"linked_field", "linked_status_field",

@@ -6,13 +6,14 @@
  "field_order": [
   "fieldname",
   "operator",
+  "value_type",
   "value",
-  "value_type"
+  "value_document_field"
  ],
  "fields": [
   {
    "fieldname": "fieldname",
-   "fieldtype": "Data",
+   "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Field Name",
    "reqd": 1
@@ -27,18 +28,26 @@
    "reqd": 1
   },
   {
-   "depends_on": "eval:!['is set', 'is not set', 'changed'].includes(doc.operator)",
+   "default": "Static Value",
+   "fieldname": "value_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Value Type",
+   "options": "Static Value\nDocument Field\nJinja Expression"
+  },
+  {
+   "depends_on": "eval:doc.value_type !== 'Document Field' && !['is set', 'is not set', 'changed'].includes(doc.operator)",
    "fieldname": "value",
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Value"
   },
   {
-   "default": "Static Value",
-   "fieldname": "value_type",
+   "depends_on": "eval:doc.value_type === 'Document Field' && !['is set', 'is not set', 'changed'].includes(doc.operator)",
+   "fieldname": "value_document_field",
    "fieldtype": "Select",
-   "label": "Value Type",
-   "options": "Static Value\nDocument Field\nJinja Expression"
+   "in_list_view": 0,
+   "label": "Value (Document Field)"
   }
  ],
  "istable": 1,

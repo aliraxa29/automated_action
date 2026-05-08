@@ -13,12 +13,13 @@ class AutomationCondition(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		fieldname: DF.Data
+		fieldname: DF.Literal[""]
 		operator: DF.Literal["=", "!=", ">", "<", ">=", "<=", "like", "not like", "in", "not in", "is set", "is not set", "changed", "changed to", "changed from"]
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data
 		value: DF.SmallText | None
+		value_document_field: DF.Literal[""]
 		value_type: DF.Literal["Static Value", "Document Field", "Jinja Expression"]
 	# end: auto-generated types
 

@@ -417,7 +417,7 @@ def execute_server_script(step, doc, rule, context=None):
 
 	from frappe.utils.safe_exec import safe_exec
 
-	safe_exec(code, _globals=exec_globals, _locals={"doc": doc})  # nosemgrep
+	safe_exec(code, _globals=exec_globals, _locals={"doc": doc})
 	return "Python code executed"
 
 

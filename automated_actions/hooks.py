@@ -1,6 +1,6 @@
 app_name = "automated_actions"
 app_title = "Automated Actions"
-app_publisher = "Ali Raxa"
+app_publisher = "Kodlyft"
 app_description = "No-code workflow automation for the Frappe Framework"
 app_email = "ar.frappe.dev@gmail.com"
 app_license = "MIT"

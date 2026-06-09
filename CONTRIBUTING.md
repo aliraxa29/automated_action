@@ -15,7 +15,7 @@ Thank you for contributing. This app follows standard Frappe development practic
 
 ```bash
 cd /path/to/frappe-bench
-bench get-app https://github.com/aliraxa29/automated_action --branch version-15
+bench get-app https://github.com/kodlyft/automated_action --branch version-15
 bench --site your-site.localhost install-app automated_actions
 ```
 

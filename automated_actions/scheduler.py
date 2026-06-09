@@ -10,6 +10,7 @@ process_cron_automation_rules() — runs every minute to check cron-scheduled ru
 
 import frappe
 from frappe.utils import add_to_date, get_datetime, now_datetime
+
 from automated_actions.conditions import evaluate_conditions
 from automated_actions.engine import run_automation_rule
 
@@ -23,8 +24,15 @@ def process_time_based_automation_rules():
 	rules = frappe.get_all(
 		"Automation Rule",
 		filters={"enabled": 1, "trigger_type": "Time Based"},
-		fields=["name", "rule_name", "document_type", "trigger_date_field",
-				"delay_count", "delay_type", "last_scheduled_run"],
+		fields=[
+			"name",
+			"rule_name",
+			"document_type",
+			"trigger_date_field",
+			"delay_count",
+			"delay_type",
+			"last_scheduled_run",
+		],
 	)
 
 	for rule_dict in rules:
@@ -95,8 +103,7 @@ def process_cron_automation_rules():
 	rules = frappe.get_all(
 		"Automation Rule",
 		filters={"enabled": 1, "trigger_type": "Cron Schedule"},
-		fields=["name", "rule_name", "document_type", "cron_expression",
-				"last_scheduled_run"],
+		fields=["name", "rule_name", "document_type", "cron_expression", "last_scheduled_run"],
 	)
 
 	now = now_datetime()
@@ -159,10 +166,10 @@ def _cron_matches(expression, dt):
 		return False
 
 	time_checks = [
-		(parts[0], dt.minute),      # minute (0-59)
-		(parts[1], dt.hour),        # hour (0-23)
-		(parts[2], dt.day),         # day of month (1-31)
-		(parts[3], dt.month),       # month (1-12)
+		(parts[0], dt.minute),  # minute (0-59)
+		(parts[1], dt.hour),  # hour (0-23)
+		(parts[2], dt.day),  # day of month (1-31)
+		(parts[3], dt.month),  # month (1-12)
 	]
 
 	for pattern, value in time_checks:

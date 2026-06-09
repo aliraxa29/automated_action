@@ -7,7 +7,6 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-
 BLOCKED_PYTHON_PATTERNS = [
 	"import os",
 	"import subprocess",
@@ -42,9 +41,14 @@ class AutomationRule(Document):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
-		from automated_actions.automated_actions.doctype.automation_action_step.automation_action_step import AutomationActionStep
-		from automated_actions.automated_actions.doctype.automation_condition.automation_condition import AutomationCondition
 		from frappe.types import DF
+
+		from automated_actions.automated_actions.doctype.automation_action_step.automation_action_step import (
+			AutomationActionStep,
+		)
+		from automated_actions.automated_actions.doctype.automation_condition.automation_condition import (
+			AutomationCondition,
+		)
 
 		action_steps: DF.Table[AutomationActionStep]
 		allow_repeated_execution: DF.Check
@@ -75,7 +79,19 @@ class AutomationRule(Document):
 		stop_on_error: DF.Check
 		trigger_date_field: DF.Literal[None]
 		trigger_fields: DF.SmallText | None
-		trigger_type: DF.Literal["", "On Create", "On Update", "On Create & Update", "On Delete", "Field Value Change", "Time Based", "Cron Schedule", "Child Record Added", "Linked Document Change", "Webhook Received"]
+		trigger_type: DF.Literal[
+			"",
+			"On Create",
+			"On Update",
+			"On Create & Update",
+			"On Delete",
+			"Field Value Change",
+			"Time Based",
+			"Cron Schedule",
+			"Child Record Added",
+			"Linked Document Change",
+			"Webhook Received",
+		]
 		webhook_secret: DF.Password | None
 	# end: auto-generated types
 
@@ -114,9 +130,9 @@ class AutomationRule(Document):
 
 		if step.action_type == "Send Email" and not step.email_template and not step.message_template:
 			frappe.throw(
-				_("Step {0}: Please provide an Email Template or Message Template for 'Send Email' action").format(
-					step.idx
-				)
+				_(
+					"Step {0}: Please provide an Email Template or Message Template for 'Send Email' action"
+				).format(step.idx)
 			)
 
 		if step.action_type == "Create ToDo" and not step.todo_description:
@@ -125,9 +141,7 @@ class AutomationRule(Document):
 			)
 
 		if step.action_type == "Call Webhook" and not step.webhook_url:
-			frappe.throw(
-				_("Step {0}: Please provide a URL for 'Call Webhook' action").format(step.idx)
-			)
+			frappe.throw(_("Step {0}: Please provide a URL for 'Call Webhook' action").format(step.idx))
 
 		if step.action_type == "Branch / If-Else" and not step.branch_condition:
 			frappe.throw(
@@ -137,44 +151,32 @@ class AutomationRule(Document):
 			)
 
 		if step.action_type == "Change Workflow State" and not step.workflow_state:
-			frappe.throw(
-				_("Step {0}: Please specify a workflow state").format(step.idx)
-			)
+			frappe.throw(_("Step {0}: Please specify a workflow state").format(step.idx))
 
 		if step.action_type in ("Add Tag", "Remove Tag") and not step.tag_value:
 			frappe.throw(
-				_("Step {0}: Please specify a tag value for '{1}' action").format(
-					step.idx, step.action_type
-				)
+				_("Step {0}: Please specify a tag value for '{1}' action").format(step.idx, step.action_type)
 			)
 
 		if step.action_type in ("Add Comment", "Create Activity") and not step.comment_text:
 			frappe.throw(
-				_("Step {0}: Please provide comment text for '{1}' action").format(
-					step.idx, step.action_type
-				)
+				_("Step {0}: Please provide comment text for '{1}' action").format(step.idx, step.action_type)
 			)
 
 		if step.action_type == "Trigger Another Automation" and not step.target_automation_rule:
-			frappe.throw(
-				_("Step {0}: Please select a target Automation Rule").format(step.idx)
-			)
+			frappe.throw(_("Step {0}: Please select a target Automation Rule").format(step.idx))
 
 	def _validate_python_code(self, step):
 		if not step.python_code:
 			frappe.throw(
-				_("Step {0}: Please provide Python code for '{1}' action").format(
-					step.idx, step.action_type
-				)
+				_("Step {0}: Please provide Python code for '{1}' action").format(step.idx, step.action_type)
 			)
 
 		code_lower = step.python_code.lower()
 		for pattern in BLOCKED_PYTHON_PATTERNS:
 			if pattern.lower() in code_lower:
 				frappe.throw(
-					_("Step {0}: Python code contains blocked operation: {1}").format(
-						step.idx, pattern
-					)
+					_("Step {0}: Python code contains blocked operation: {1}").format(step.idx, pattern)
 				)
 
 	def _validate_conditions(self):
@@ -192,13 +194,9 @@ class AutomationRule(Document):
 			try:
 				parsed = json.loads(value)
 				if not isinstance(parsed, list):
-					frappe.throw(
-						_("Step {0}: {1} must be a JSON array").format(step.idx, fieldname)
-					)
+					frappe.throw(_("Step {0}: {1} must be a JSON array").format(step.idx, fieldname))
 			except json.JSONDecodeError:
-				frappe.throw(
-					_("Step {0}: {1} must be valid JSON").format(step.idx, fieldname)
-				)
+				frappe.throw(_("Step {0}: {1} must be valid JSON").format(step.idx, fieldname))
 
 	def _set_action_categories(self):
 		for step in self.action_steps:

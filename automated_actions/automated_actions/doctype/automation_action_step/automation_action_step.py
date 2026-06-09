@@ -14,7 +14,34 @@ class AutomationActionStep(Document):
 		from frappe.types import DF
 
 		action_category: DF.Literal["Business Action", "Advanced Action"]
-		action_type: DF.Literal["", "Update Current Record", "Update Linked Record", "Create Record", "Create Child Row", "Create ToDo", "Create Activity", "Add Comment", "Send Email", "Send WhatsApp", "Send Notification", "Assign User", "Add Tag", "Remove Tag", "Change Workflow State", "Call Webhook", "Trigger Another Automation", "Execute Server Script", "Execute Jinja Expression", "Custom Python Handler", "External API Call", "Queue Background Job", "Branch / If-Else", "Wait / Delay", "Loop Through Child Rows", "Aggregate and Decide"]
+		action_type: DF.Literal[
+			"",
+			"Update Current Record",
+			"Update Linked Record",
+			"Create Record",
+			"Create Child Row",
+			"Create ToDo",
+			"Create Activity",
+			"Add Comment",
+			"Send Email",
+			"Send WhatsApp",
+			"Send Notification",
+			"Assign User",
+			"Add Tag",
+			"Remove Tag",
+			"Change Workflow State",
+			"Call Webhook",
+			"Trigger Another Automation",
+			"Execute Server Script",
+			"Execute Jinja Expression",
+			"Custom Python Handler",
+			"External API Call",
+			"Queue Background Job",
+			"Branch / If-Else",
+			"Wait / Delay",
+			"Loop Through Child Rows",
+			"Aggregate and Decide",
+		]
 		assign_to_field: DF.Data | None
 		assign_to_user: DF.Link | None
 		branch_condition: DF.SmallText | None

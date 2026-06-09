@@ -1,7 +1,7 @@
 [project]
 name = "automated_actions"
 authors = [
-    { name = "Ali Raxa", email = "ar.frappe.dev@gmail.com"}
+    { name = "Kodlyft", email = "hello@kodlyft.com"}
 ]
 description = "No-code workflow automation for the Frappe Framework"
 requires-python = ">=3.10"
@@ -23,10 +23,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/aliraxa29/automated_action"
-Repository = "https://github.com/aliraxa29/automated_action"
-Issues = "https://github.com/aliraxa29/automated_action/issues"
-Changelog = "https://github.com/aliraxa29/automated_action/releases"
+Homepage = "https://github.com/kodlyft/automated_action"
+Repository = "https://github.com/kodlyft/automated_action"
+Issues = "https://github.com/kodlyft/automated_action/issues"
+Changelog = "https://github.com/kodlyft/automated_action/releases"
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]

@@ -1,0 +1,22 @@
+{
+ "app": "automated_actions",
+ "bg_color": "gray",
+ "creation": "2026-05-17 21:21:29.896737",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon_type": "App",
+ "idx": 0,
+ "label": "Automated Actions",
+ "link_to": "Automated Actions Space",
+ "link_type": "Workspace Sidebar",
+ "logo_url": "/assets/automated_actions/images/logo.svg",
+ "modified": "2026-05-17 22:07:58.291269",
+ "modified_by": "Administrator",
+ "name": "Automated Actions",
+ "owner": "Administrator",
+ "restrict_removal": 0,
+ "roles": [],
+ "sidebar": "Automated Actions Space",
+ "standard": 1
+}

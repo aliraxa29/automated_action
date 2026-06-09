@@ -1,0 +1,63 @@
+{
+ "app": "automated_actions",
+ "creation": "2026-05-17 22:29:15.167155",
+ "docstatus": 0,
+ "doctype": "Workspace Sidebar",
+ "header_icon": "organization",
+ "idx": 0,
+ "items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Automated Actions",
+   "link_type": "Workspace",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Learn Digital Invoicing",
+   "link_type": "URL",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "wand-sparkles",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Automation Rule",
+   "link_to": "Automation Rule",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "small-file",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Automation Log",
+   "link_to": "Automation Log",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-05-17 22:38:12.303153",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Automated Actions",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "Automated Actions"
+}

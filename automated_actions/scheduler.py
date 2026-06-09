@@ -149,6 +149,7 @@ def _cron_matches(expression, dt):
 	"""Check if a cron expression matches a given datetime.
 
 	Supports standard 5-field cron: minute hour day_of_month month day_of_week.
+	Day-of-week uses the cron convention (Sunday=0..Saturday=6; 7 also means Sunday).
 	"""
 	if not expression:
 		return False
@@ -157,19 +158,31 @@ def _cron_matches(expression, dt):
 	if len(parts) != 5:
 		return False
 
-	checks = [
+	time_checks = [
 		(parts[0], dt.minute),      # minute (0-59)
 		(parts[1], dt.hour),        # hour (0-23)
 		(parts[2], dt.day),         # day of month (1-31)
 		(parts[3], dt.month),       # month (1-12)
-		(parts[4], dt.weekday()),   # day of week (0=Mon in Python, cron uses 0=Sun)
 	]
 
-	for pattern, value in checks:
+	for pattern, value in time_checks:
 		if not _cron_field_matches(pattern, value):
 			return False
 
-	return True
+	return _cron_dow_matches(parts[4], dt)
+
+
+def _cron_dow_matches(pattern, dt):
+	"""Match a cron day-of-week field against a datetime.
+
+	cron uses Sunday=0..Saturday=6 (and also accepts 7 for Sunday), whereas Python's
+	datetime.weekday() is Monday=0..Sunday=6. isoweekday() % 7 converts to cron's scheme.
+	"""
+	cron_dow = dt.isoweekday() % 7  # Mon=1..Sun=7 -> Sun=0..Sat=6
+	if _cron_field_matches(pattern, cron_dow):
+		return True
+	# Standard cron also accepts 7 as Sunday.
+	return cron_dow == 0 and _cron_field_matches(pattern, 7)
 
 
 def _cron_field_matches(pattern, value):
@@ -186,16 +199,26 @@ def _cron_field_matches(pattern, value):
 				step = int(step_str)
 			except ValueError:
 				continue
+			if step <= 0:
+				continue
 			if base == "*":
 				if value % step == 0:
+					return True
+			elif "-" in base:
+				try:
+					low_str, high_str = base.split("-", 1)
+					low, high = int(low_str), int(high_str)
+				except ValueError:
+					continue
+				if low <= value <= high and (value - low) % step == 0:
 					return True
 			else:
 				try:
 					base_val = int(base)
-					if value >= base_val and (value - base_val) % step == 0:
-						return True
 				except ValueError:
 					continue
+				if value >= base_val and (value - base_val) % step == 0:
+					return True
 		elif "-" in part:
 			try:
 				low, high = part.split("-", 1)

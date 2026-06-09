@@ -30,7 +30,7 @@ def get_rules_for_doctype(doctype, trigger_type=None):
 	rules = [r for r in all_rules if r.get("document_type") == doctype and r.get("enabled")]
 
 	if trigger_type:
-		if isinstance(trigger_type, (list, tuple)):
+		if isinstance(trigger_type, list | tuple):
 			rules = [r for r in rules if r.get("trigger_type") in trigger_type]
 		else:
 			rules = [r for r in rules if r.get("trigger_type") == trigger_type]
@@ -48,14 +48,29 @@ def _get_cached_rules():
 				"Automation Rule",
 				filters={"enabled": 1},
 				fields=[
-					"name", "rule_name", "document_type", "trigger_type", "trigger_fields",
-					"field_from_value", "field_to_value", "enabled", "priority",
-					"run_mode", "stop_on_error", "allow_repeated_execution",
+					"name",
+					"rule_name",
+					"document_type",
+					"trigger_type",
+					"trigger_fields",
+					"field_from_value",
+					"field_to_value",
+					"enabled",
+					"priority",
+					"run_mode",
+					"stop_on_error",
+					"allow_repeated_execution",
 					"recursion_protection",
-					"trigger_date_field", "delay_count", "delay_type",
-					"cron_expression", "child_doctype", "linked_doctype",
-					"linked_field", "linked_status_field",
-					"condition_logic", "custom_condition",
+					"trigger_date_field",
+					"delay_count",
+					"delay_type",
+					"cron_expression",
+					"child_doctype",
+					"linked_doctype",
+					"linked_field",
+					"linked_status_field",
+					"condition_logic",
+					"custom_condition",
 					"last_scheduled_run",
 				],
 				order_by="priority desc",
@@ -211,15 +226,18 @@ def _create_log(rule, doc):
 
 def _add_log_step(log, step, status, started_at, result=None, error=None):
 	"""Add a step entry to the Automation Log."""
-	log.append("steps", {
-		"step_name": step.step_name or step.action_type,
-		"action_type": step.action_type,
-		"status": status,
-		"started_at": started_at,
-		"completed_at": now_datetime(),
-		"result_summary": result,
-		"error_message": error,
-	})
+	log.append(
+		"steps",
+		{
+			"step_name": step.step_name or step.action_type,
+			"action_type": step.action_type,
+			"status": status,
+			"started_at": started_at,
+			"completed_at": now_datetime(),
+			"result_summary": result,
+			"error_message": error,
+		},
+	)
 
 
 def _update_rule_stats(rule_name, status):

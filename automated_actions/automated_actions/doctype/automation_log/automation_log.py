@@ -11,8 +11,11 @@ class AutomationLog(Document):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
-		from automated_actions.automated_actions.doctype.automation_log_step.automation_log_step import AutomationLogStep
 		from frappe.types import DF
+
+		from automated_actions.automated_actions.doctype.automation_log_step.automation_log_step import (
+			AutomationLogStep,
+		)
 
 		automation_rule: DF.Link | None
 		completed_at: DF.Datetime | None

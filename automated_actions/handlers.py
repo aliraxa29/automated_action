@@ -8,12 +8,13 @@ All triggers go through the unified engine for Automation Rules.
 """
 
 import frappe
+
 from automated_actions.conditions import (
 	check_field_value_change,
 	check_trigger_fields,
 	evaluate_conditions,
 )
-from automated_actions.engine import get_rules_for_doctype, run_automation_rule, _run_rule_async
+from automated_actions.engine import _run_rule_async, get_rules_for_doctype, run_automation_rule
 
 _PROCESSING_FLAG = "_automation_processing"
 _MAX_RECURSION_DEPTH = 10
@@ -45,9 +46,7 @@ def handle_on_update(doc, method=None):
 
 	_increment_depth(doc)
 	try:
-		update_rules = get_rules_for_doctype(
-			doc.doctype, trigger_type=["On Update", "On Create & Update"]
-		)
+		update_rules = get_rules_for_doctype(doc.doctype, trigger_type=["On Update", "On Create & Update"])
 		for rule_dict in update_rules:
 			if not check_trigger_fields(rule_dict, doc):
 				continue
@@ -87,9 +86,7 @@ def handle_on_update_after_submit(doc, method=None):
 
 	_increment_depth(doc)
 	try:
-		update_rules = get_rules_for_doctype(
-			doc.doctype, trigger_type=["On Update", "On Create & Update"]
-		)
+		update_rules = get_rules_for_doctype(doc.doctype, trigger_type=["On Update", "On Create & Update"])
 		for rule_dict in update_rules:
 			if not check_trigger_fields(rule_dict, doc):
 				continue

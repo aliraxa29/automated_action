@@ -9,6 +9,7 @@ against a document, optionally comparing with the document before save.
 """
 
 import re
+
 import frappe
 from frappe.utils import cstr
 
@@ -286,7 +287,7 @@ def _coerce_type(filter_value, reference_value):
 
 def _parse_in_values(value):
 	"""Parse a comma-separated or list value into a list of strings."""
-	if isinstance(value, (list, tuple)):
+	if isinstance(value, list | tuple):
 		return [cstr(v).strip() for v in value]
 	return [v.strip() for v in cstr(value).split(",")]
 

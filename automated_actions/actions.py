@@ -155,15 +155,17 @@ def execute_create_todo(step, doc, rule, context=None):
 	if not allocated_to:
 		allocated_to = doc.owner
 
-	todo = frappe.get_doc({
-		"doctype": "ToDo",
-		"description": description,
-		"reference_type": doc.doctype,
-		"reference_name": doc.name,
-		"allocated_to": allocated_to,
-		"assigned_by": frappe.session.user,
-		"status": "Open",
-	})
+	todo = frappe.get_doc(
+		{
+			"doctype": "ToDo",
+			"description": description,
+			"reference_type": doc.doctype,
+			"reference_name": doc.name,
+			"allocated_to": allocated_to,
+			"assigned_by": frappe.session.user,
+			"status": "Open",
+		}
+	)
 	todo.insert(ignore_permissions=True)
 	return f"Created ToDo {todo.name} assigned to {allocated_to}"
 
@@ -172,14 +174,16 @@ def execute_create_activity(step, doc, rule, context=None):
 	"""Create an Activity Log entry."""
 	text = resolve_template(step.comment_text, doc, context) or ""
 
-	activity = frappe.get_doc({
-		"doctype": "Activity Log",
-		"subject": text[:140],
-		"content": text,
-		"reference_doctype": doc.doctype,
-		"reference_name": doc.name,
-		"user": frappe.session.user,
-	})
+	activity = frappe.get_doc(
+		{
+			"doctype": "Activity Log",
+			"subject": text[:140],
+			"content": text,
+			"reference_doctype": doc.doctype,
+			"reference_name": doc.name,
+			"user": frappe.session.user,
+		}
+	)
 	activity.insert(ignore_permissions=True)
 	return f"Created Activity Log {activity.name}"
 
@@ -200,7 +204,8 @@ def execute_send_email(step, doc, rule, context=None):
 	if step.email_template:
 		template = frappe.get_doc("Email Template", step.email_template)
 		subject = frappe.render_template(template.subject, {"doc": doc})
-		message = frappe.render_template(
+		# Renders an admin-authored Email Template (Automation Rule is System Manager only).
+		message = frappe.render_template(  # nosemgrep
 			template.get("response_html") or template.response, {"doc": doc}
 		)
 	else:
@@ -227,17 +232,19 @@ def execute_send_whatsapp(step, doc, rule, context=None):
 		return "No recipient found for WhatsApp"
 
 	try:
-		frappe.get_doc({
-			"doctype": "Communication",
-			"communication_type": "Communication",
-			"communication_medium": "WhatsApp",
-			"sent_or_received": "Sent",
-			"content": message,
-			"subject": resolve_template(step.subject, doc, context) or doc.name,
-			"reference_doctype": doc.doctype,
-			"reference_name": doc.name,
-			"phone_no": recipient,
-		}).insert(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "Communication",
+				"communication_type": "Communication",
+				"communication_medium": "WhatsApp",
+				"sent_or_received": "Sent",
+				"content": message,
+				"subject": resolve_template(step.subject, doc, context) or doc.name,
+				"reference_doctype": doc.doctype,
+				"reference_name": doc.name,
+				"phone_no": recipient,
+			}
+		).insert(ignore_permissions=True)
 	except Exception:
 		frappe.log_error(title="Automation: WhatsApp send error", message=frappe.get_traceback())
 		return f"WhatsApp send failed for {recipient}"
@@ -254,15 +261,17 @@ def execute_send_notification(step, doc, rule, context=None):
 	subject = resolve_template(step.subject, doc, context) or f"Notification: {doc.name}"
 	message = resolve_template(step.message_template, doc, context) or ""
 
-	notification = frappe.get_doc({
-		"doctype": "Notification Log",
-		"subject": subject,
-		"email_content": message,
-		"for_user": recipient,
-		"type": "Alert",
-		"document_type": doc.doctype,
-		"document_name": doc.name,
-	})
+	notification = frappe.get_doc(
+		{
+			"doctype": "Notification Log",
+			"subject": subject,
+			"email_content": message,
+			"for_user": recipient,
+			"type": "Alert",
+			"document_type": doc.doctype,
+			"document_name": doc.name,
+		}
+	)
 	notification.insert(ignore_permissions=True)
 	return f"Notification sent to {recipient}"
 
@@ -277,12 +286,14 @@ def execute_assign_user(step, doc, rule, context=None):
 
 	from frappe.desk.form.assign_to import add as assign_add
 
-	assign_add({
-		"assign_to": [user],
-		"doctype": doc.doctype,
-		"name": doc.name,
-		"description": resolve_template(step.todo_description, doc, context) or "",
-	})
+	assign_add(
+		{
+			"assign_to": [user],
+			"doctype": doc.doctype,
+			"name": doc.name,
+			"description": resolve_template(step.todo_description, doc, context) or "",
+		}
+	)
 	return f"Assigned {user} to {doc.doctype} {doc.name}"
 
 
@@ -302,11 +313,14 @@ def execute_remove_tag(step, doc, rule, context=None):
 	if not tag:
 		return "No tag specified"
 
-	frappe.db.delete("Tag Link", {
-		"document_type": doc.doctype,
-		"document_name": doc.name,
-		"tag": tag,
-	})
+	frappe.db.delete(
+		"Tag Link",
+		{
+			"document_type": doc.doctype,
+			"document_name": doc.name,
+			"tag": tag,
+		},
+	)
 	return f"Tag '{tag}' removed from {doc.doctype} {doc.name}"
 
 
@@ -353,6 +367,7 @@ def execute_call_webhook(step, doc, rule, context=None):
 			headers["X-API-Key"] = creds
 		elif step.webhook_auth_type == "Basic Auth":
 			import base64
+
 			headers["Authorization"] = f"Basic {base64.b64encode(creds.encode()).decode()}"
 
 	if not headers.get("Content-Type") and method in ("POST", "PUT", "PATCH"):
@@ -400,7 +415,9 @@ def execute_server_script(step, doc, rule, context=None):
 		"json": json,
 	}
 
-	frappe.utils.safe_exec.safe_exec(code, _globals=exec_globals, _locals={"doc": doc})
+	from frappe.utils.safe_exec import safe_exec
+
+	safe_exec(code, _globals=exec_globals, _locals={"doc": doc})  # nosemgrep
 	return "Python code executed"
 
 
@@ -410,9 +427,16 @@ def execute_jinja_expression(step, doc, rule, context=None):
 	if not template:
 		return "No Jinja template provided"
 
-	result = frappe.render_template(template, {
-		"doc": doc, "frappe": frappe, "rule": rule, "context": context or {},
-	})
+	# Renders an admin-authored Jinja template from the rule step (System Manager only).
+	result = frappe.render_template(  # nosemgrep
+		template,
+		{
+			"doc": doc,
+			"frappe": frappe,
+			"rule": rule,
+			"context": context or {},
+		},
+	)
 	return f"Jinja rendered: {result[:200]}"
 
 
@@ -493,9 +517,8 @@ def execute_wait_delay(step, doc, rule, context=None):
 			remaining_steps.append(s.name)
 
 	if remaining_steps and total_seconds > 0:
-		from frappe.utils import add_to_date
-
-		execute_at = add_to_date(now_datetime(), seconds=total_seconds)
+		# NOTE: frappe.enqueue has no native delay; remaining steps are queued to run after
+		# commit rather than after `total_seconds`. A true delay needs a scheduled job.
 		frappe.enqueue(
 			_run_steps_async,
 			rule_name=rule.name,

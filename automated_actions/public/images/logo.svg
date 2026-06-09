@@ -1,0 +1,23 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" width="512" height="512" role="img" aria-label="Automated Actions app icon">
+  <!-- royal-blue squircle tile (matched to Digital Invoicing) -->
+  <rect width="512" height="512" rx="140" fill="#2A57E4"/>
+
+  <g transform="translate(8 -2)">
+    <!-- lightning bolt = the action / trigger -->
+    <path d="M248 115 L118 271 L235 271 L222 375 L352 219 L235 219 Z"
+          fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14"
+          stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- thin blue gap separating the badge from the bolt -->
+    <circle cx="308" cy="330" r="87" fill="#2A57E4"/>
+
+    <!-- white badge -->
+    <circle cx="308" cy="330" r="77" fill="#FFFFFF"/>
+
+    <!-- circular arrow = automated / runs on its own -->
+    <path d="M328 295.4 A40 40 0 1 1 288 295.4"
+          fill="none" stroke="#2A57E4" stroke-width="14" stroke-linecap="round"/>
+    <path d="M301.9 287.4 L289.7 308.3 L277.7 287.5 Z"
+          fill="#2A57E4" stroke="#2A57E4" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+</svg>

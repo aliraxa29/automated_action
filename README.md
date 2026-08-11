@@ -44,7 +44,7 @@ You can install this app using the [bench](https://github.com/frappe/bench) CLI:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app https://github.com/aliraxa29/automated_action --branch version-15
+bench get-app https://github.com/kodlyft/automated_action --branch version-15
 bench --site your-site.localhost install-app automated_actions
 ```
 
@@ -104,7 +104,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 1. Set up a Frappe bench (see [Frappe docs](https://frappeframework.com/docs/user/en/installation))
 2. Install the app in development mode:
    ```bash
-   bench get-app https://github.com/aliraxa29/automated_action --branch version-15
+   bench get-app https://github.com/kodlyft/automated_action --branch version-15
    bench --site your-site.localhost install-app automated_actions
    ```
 3. Enable pre-commit hooks:
@@ -151,4 +151,4 @@ If you discover a security vulnerability, please report it responsibly. See [SEC
 
 This project is licensed under the [MIT License](license.txt).
 
-Copyright © 2026 Ali Raxa
+Copyright © 2026 Kodlyft
